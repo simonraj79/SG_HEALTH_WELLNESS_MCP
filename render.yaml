@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: singapore-health-wellness-mcp
+    runtime: node
+    region: singapore
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeployTrigger: commit
+    maxShutdownDelaySeconds: 30
+    envVars:
+      - key: NODE_VERSION
+        value: 24.19.0
+      - key: HTTP_RATE_LIMIT_PER_MINUTE
+        value: "60"
+      - key: UPSTREAM_TIMEOUT_MS
+        value: "10000"
