@@ -3,7 +3,7 @@ services:
     name: singapore-health-wellness-mcp
     runtime: node
     region: singapore
-    plan: free
+    plan: starter
     buildCommand: npm ci && npm run build
     startCommand: npm start
     healthCheckPath: /healthz
