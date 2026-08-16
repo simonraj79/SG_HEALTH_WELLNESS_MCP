@@ -21,6 +21,69 @@ The server targets the stable MCP `2026-07-28` specification and the official Ty
 
 The fixed source and response contract is documented in [FEATURE_MATRIX.md](./FEATURE_MATRIX.md). Every successful tool result includes both readable MCP content and validated `structuredContent`.
 
+## Install the MCP in Codex
+
+The quickest option is the public Streamable HTTP deployment in Singapore:
+
+```text
+https://singapore-health-wellness-mcp.onrender.com/mcp
+```
+
+No API key is currently required to connect to this public MCP endpoint.
+
+### ChatGPT desktop app or Codex IDE extension
+
+1. Open **Settings → MCP servers**.
+2. Select **Add server**.
+3. Name it `sg-health-wellness`, choose **Streamable HTTP**, and enter `https://singapore-health-wellness-mcp.onrender.com/mcp`.
+4. Save, then restart the desktop app or IDE extension.
+5. Enter `/mcp` in the composer to confirm the server is connected and exposes six tools.
+
+### Codex CLI
+
+```bash
+codex mcp add sg-health-wellness --url https://singapore-health-wellness-mcp.onrender.com/mcp
+codex mcp list
+```
+
+The ChatGPT desktop app, Codex CLI, and Codex IDE extension share MCP configuration on the same Codex host.
+
+### Manual `config.toml` setup
+
+Add this to `~/.codex/config.toml`, or to `.codex/config.toml` inside a trusted project:
+
+```toml
+[mcp_servers.sg_health_wellness]
+url = "https://singapore-health-wellness-mcp.onrender.com/mcp"
+enabled = true
+default_tools_approval_mode = "auto"
+```
+
+Restart Codex after saving, then use `/mcp` to verify the connection.
+
+### Install and run locally over STDIO
+
+Use this option for development or when you do not want to depend on the hosted endpoint:
+
+```bash
+git clone https://github.com/simonraj79/SG_HEALTH_WELLNESS_MCP.git
+cd SG_HEALTH_WELLNESS_MCP
+npm ci
+npm run build
+```
+
+Copy `.env.example` to `.env` and optionally add a `DATA_GOV_SG_API_KEY`. Then add a project-scoped `.codex/config.toml`, replacing `cwd` with the absolute path to your clone:
+
+```toml
+[mcp_servers.sg_health_wellness_local]
+command = "node"
+args = ["--env-file=.env", "dist/src/stdio.js"]
+cwd = "C:/absolute/path/to/SG_HEALTH_WELLNESS_MCP"
+enabled = true
+```
+
+Restart Codex and use `/mcp` to confirm `sg_health_wellness_local` is connected. You can validate the local server first with `npm run test:local-mcp`.
+
 ## Run locally
 
 Requirements: Node.js 20 or newer. Render is configured to use Node.js 24.
@@ -68,15 +131,17 @@ The repository includes a complete [render.yaml](./render.yaml); no source chang
 5. Leave `MCP_API_KEY` unset for a public endpoint, or set a strong secret to require `Authorization: Bearer <secret>` on `/mcp`.
 6. Deploy the Blueprint and wait for `/healthz` to report `status: ok`.
 
-Your client URL will be:
+The public deployment for this repository is:
 
 ```text
-https://<your-render-service>.onrender.com/mcp
+https://singapore-health-wellness-mcp.onrender.com/mcp
 ```
+
+If you deploy a separate copy, its client URL will be `https://<your-render-service>.onrender.com/mcp`.
 
 Render supplies `PORT` and `RENDER_EXTERNAL_HOSTNAME` automatically. The app binds to `0.0.0.0:$PORT` and automatically allows its Render hostname. If you add a custom domain, add its hostname—without a scheme or port—to `ALLOWED_HOSTS`. Browser-based MCP callers with an `Origin` header must also have their origin hostname in `ALLOWED_ORIGINS`.
 
-The included free plan is suitable for evaluation and community use, but can sleep when idle. Choose a paid Render plan when predictable startup time or sustained traffic matters.
+The included Blueprint uses Render's lowest paid web-service tier, `starter`, in the Singapore region for predictable availability without free-tier idle spin-down.
 
 ## Configuration
 
